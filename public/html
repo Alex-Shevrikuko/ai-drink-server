@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <title>Какво пия?</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<style>
+  body {
+  background-image: url('images/Background_Without_chashi.png');
+  background-size: cover;
+}
+
+  
+ 
+
+</style>
+ 
+  <div class="app">
+
+    
+    
+    <!-- Search -->
+     <img src="images/Logo.png" alt="piq" class="cocos">
+
+    <div class="search-wrapper">
+      <span class="icon">🔍</span>
+      <input type="text" placeholder="Какво ще пиеш днес?" />
+      <button class="icon clear" id="clearBtn" type="button">✖</button>
+    </div>
+
+    <!-- Speech bubble -->
+   <div class="bubble" id="bubble" style="display:none;">
+    
+  <p class="chosen" id="chosenText">Избрахте:</p>
+
+    <div class="card">
+
+  <div class="card-content">
+
+    <!-- ЛЯВО -->
+    <div class="card-left">
+
+      <span class="badge good" id="healthBadge">Добро</span>
+
+      <p id="drinkInfo"></p>
+
+    </div>
+
+
+    <!-- ДЯСНО -->
+    <div class="card-right">
+
+      <img id="ratingImage" src="images/910.png">
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+</div>
+
+
+  </div>
+<script>
+const input = document.querySelector(".search-wrapper input");
+const bubble = document.getElementById("bubble");
+const chosenText = document.getElementById("chosenText");
+const drinkInfo = document.getElementById("drinkInfo");
+const healthBadge = document.getElementById("healthBadge");
+const clearBtn = document.getElementById("clearBtn");
+const ratingImage = document.getElementById("ratingImage");
+
+
+/* ⭐ ФУНКЦИЯ ЗА СМЯНА НА СНИМКИТЕ */
+function setRating(rating){
+
+let imageName = "";
+
+if(rating === 1) imageName = "12.png";
+
+if(rating === 2) imageName = "34.png";
+
+if(rating === 3) imageName = "56.png";
+
+if(rating === 4) imageName = "78.png";
+
+if(rating === 5) imageName = "910.png";
+
+ratingImage.src = "images/" + imageName;
+
+}
+
+
+
+/* Явно НЕ напитки */
+const notDrinks = [
+  "хляб",
+  "пица",
+  "бургер",
+  "телефон",
+  "лаптоп",
+  "стол",
+  "маса",
+  "кола кола"
+];
+
+
+input.addEventListener("keydown", function (e) {
+
+if (e.key === "Enter") {
+
+const value = input.value.trim();
+
+if (!value) return;
+
+const text = value.toLowerCase();
+
+bubble.style.display = "block";
+
+chosenText.textContent = `Избрахте: ${value}`;
+
+
+
+// ❌ НЕ Е НАПИТКА
+
+if (notDrinks.includes(text)) {
+
+healthBadge.textContent = "Не е напитка";
+
+healthBadge.className = "badge warning";
+
+drinkInfo.textContent =
+"Въведеното не изглежда като напитка.";
+
+setRating(3);
+
+return;
+
+}
+
+
+
+// 🟢 ВОДА
+
+if (text === "вода") {
+
+healthBadge.textContent = "Добро";
+
+healthBadge.className = "badge good";
+
+drinkInfo.textContent =
+"Водата е здравословна, без захар и без въглехидрати.";
+
+setRating(5);
+
+return;
+
+}
+
+
+
+// 🔴 ВСИЧКО ДРУГО
+
+healthBadge.textContent = "Внимавай";
+
+healthBadge.className = "badge bad";
+
+drinkInfo.textContent =
+"Тази напитка може да съдържа захар.";
+
+setRating(1);
+
+}
+
+});
+
+
+
+// ❌ CLEAR BUTTON
+
+clearBtn.addEventListener("click", function () {
+
+input.value = "";
+
+bubble.style.display = "none";
+
+chosenText.textContent = "Избрахте:";
+
+drinkInfo.textContent = "";
+
+healthBadge.textContent = "Добро";
+
+healthBadge.className = "badge good";
+
+setRating(5);
+
+});
+
+</script>
+
+    
+</body>
+</html>
