@@ -1,110 +1,60 @@
-function checkDrink() {
-
-const inputElement = document.getElementById("drinkInput");
-
-const text = inputElement.value.trim().toLowerCase();
-
+const input = document.querySelector(".search-wrapper input");
 const bubble = document.getElementById("bubble");
-
-const selectedText = document.getElementById("chosenText");
-
-const healthBadge = document.getElementById("healthBadge");
-
-const ratingImage = document.getElementById("ratingImage");
-
+const chosenText = document.getElementById("chosenText");
 const drinkInfo = document.getElementById("drinkInfo");
-
-
-if (!text) return;
-
-
-bubble.style.display = "block";
-
-selectedText.textContent = "Избрахте: " + text;
-
-
-
-// 🟢 ВОДА
-if (text === "вода") {
-
-healthBadge.textContent = "Добро";
-
-healthBadge.className = "badge good";
-
-drinkInfo.textContent = "Водата е здравословна, без захар.";
-
-setRating(5);
-
-return;
-
-}
-
-
-// 🔴 КОЛА
-if (text === "кола") {
-
-healthBadge.textContent = "Внимавай";
-
-healthBadge.className = "badge bad";
-
-drinkInfo.textContent = "Колата съдържа много захар.";
-
-setRating(1);
-
-return;
-
-}
-
-
-// ❌ НЕ Е НАПИТКА
-
-healthBadge.textContent = "Не е напитка";
-
-healthBadge.className = "badge warning";
-
-drinkInfo.textContent = "Въведеното не е напитка.";
-
-setRating(1);
-
-}
-
-
-
-// ⭐ функция за снимките
-
-function setRating(rating){
-
+const healthBadge = document.getElementById("healthBadge");
 const ratingImage = document.getElementById("ratingImage");
 
-
-let imageName = "";
-
-
-if(rating === 1) imageName = "12.png";
-
-if(rating === 2) imageName = "34.png";
-
-if(rating === 3) imageName = "56.png";
-
-if(rating === 4) imageName = "78.png";
-
-if(rating === 5) imageName = "910.png";
-
-
-ratingImage.src = "images/" + imageName;
-
+// функция за снимките
+function setRating(rating){
+  let imageName = "";
+  if(rating === 1) imageName = "12.png";
+  if(rating === 2) imageName = "34.png";
+  if(rating === 3) imageName = "56.png";
+  if(rating === 4) imageName = "78.png";
+  if(rating === 5) imageName = "910.png";
+  ratingImage.src = "images/" + imageName;
 }
 
+// Clear Button
+document.getElementById("clearBtn").addEventListener("click", function(){
+  input.value = "";
+  bubble.style.display = "none";
+  chosenText.textContent = "Избрахте:";
+  drinkInfo.textContent = "";
+  healthBadge.textContent = "Добро";
+  healthBadge.className = "badge good";
+  setRating(5);
+});
 
+// Основна функция за AI оценка
+input.addEventListener("keydown", async function(e){
+  if(e.key === "Enter"){
+    const drinkName = input.value.trim();
+    if(!drinkName) return;
 
-// ❌ CLEAR BUTTON
+    bubble.style.display = "block";
+    chosenText.textContent = `Избрахте: ${drinkName}`;
 
-const clearBtn = document.getElementById("clearBtn");
+    try {
+      const response = await fetch("/api/checkDrink", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ drink: drinkName })
+      });
+      const data = await response.json();
 
-clearBtn.addEventListener("click", function () {
+      drinkInfo.textContent = data.description;
+      healthBadge.textContent = data.label;
+      healthBadge.className = `badge ${data.labelClass}`;
+      setRating(data.rating);
 
-document.getElementById("drinkInput").value = "";
-
-document.getElementById("bubble").style.display = "none";
-
+    } catch(err){
+      console.error(err);
+      drinkInfo.textContent = "Грешка при оценката на напитката.";
+      healthBadge.textContent = "Неизвестно";
+      healthBadge.className = "badge warning";
+      setRating(3);
+    }
+  }
 });
