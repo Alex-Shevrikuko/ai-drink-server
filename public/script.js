@@ -45,7 +45,33 @@ bubble.style.display = "block";
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: drinkName })
       });
-      const data = await response.json();
+     // UNKNOWN (не е напитка)
+if (data.type === "unknown") {
+
+  healthBadge.textContent = "Не е напитка";
+  healthBadge.className = "badge warning";
+
+  drinkInfo.textContent = data.description;
+
+  setRating(3); // неутрална снимка
+  return;
+}
+
+
+// DRINK
+healthBadge.textContent = data.label || "Оценено";
+
+// цветове
+if (data.label === "Добро") {
+  healthBadge.className = "badge good";
+} else {
+  healthBadge.className = "badge bad";
+}
+
+drinkInfo.textContent = data.description;
+
+// снимка според rating
+setRating(Number(data.rating) || 3);
       console.log(data);
 
       drinkInfo.textContent = data.description;
@@ -65,6 +91,7 @@ bubble.style.display = "block";
     }
   }
 });
+
 
 
 
