@@ -7,7 +7,12 @@ import path from "path";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://drink.free.bg",
+    "http://drink.free.bg"
+  ]
+}));
 app.use(express.json());
 
 // 👉 ТОВА казва на Express да използва public папката
@@ -76,4 +81,5 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
 
