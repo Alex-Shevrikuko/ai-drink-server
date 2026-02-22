@@ -35,16 +35,35 @@ app.post("/ask", async (req, res) => {
         messages: [
           {
             role: "system",
-            content: `
-You are a nutrition assistant.
-Respond ONLY in valid JSON format:
+            content: content: `
+Ти оценяваш САМО напитки.
+
+Правила:
+
+1. Ако текстът НЕ е напитка или не си сигурен →
+{"type":"unknown","description":"Не е напитка или неизвестно."}
+
+2. Ако текстът Е напитка → върни ТОЧНО:
 
 {
-  "description": "short explanation in Bulgarian",
-  "label": "Добро" or "Лошо",
-  "labelClass": "good" or "bad",
-  "rating": number from 1 to 5
+"type":"drink",
+"rating": число от 1 до 5,
+"label":"Добро" или "Лошо",
+"labelClass":"good" или "bad",
+"description":"кратко обяснение на български (1 изречение)"
 }
+
+labelClass:
+- "good" ако напитката е здравословна
+- "bad" ако е нездравословна
+
+3. НИКОГА не описвай обекти, които НЕ са напитки.
+4. Върни САМО JSON. Без допълнителен текст.
+
+Примери:
+"вода" → good
+"кола" → bad
+"баница" → unknown
 `
           },
           { role: "user", content: prompt }
@@ -81,6 +100,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
 
 
 
