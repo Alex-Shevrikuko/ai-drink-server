@@ -1,28 +1,34 @@
 import dotenv from "dotenv";
 dotenv.config();
+
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
-import path from "path";
 
 const app = express();
 
 app.use(cors({
   origin: [
-    "https://drink.free.bg",
-    "http://drink.free.bg"
-  ]
+    "https://kakvopiq.free.bg",
+    "http://kakvopiq.free.bg"
+  ],
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
 }));
-app.use(express.json());
 
-// 👉 ТОВА казва на Express да използва public папката
+app.use(express.json());
 app.use(express.static("public"));
 
+function safeParseJSON(text) {
+  try { return JSON.parse(text); } catch { return null; }
+}
 
-// AI endpoint
 app.post("/ask", async (req, res) => {
   try {
-    const prompt = req.body.prompt;
+    const prompt = (req.body?.prompt || "").toString().trim();
+    if (!prompt) {
+      return res.json({ type: "unknown", description: "Не е напитка или неизвестно." });
+    }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -32,6 +38,7 @@ app.post("/ask", async (req, res) => {
       },
       body: JSON.stringify({
         model: "gpt-4o-mini",
+        temperature: 0.2,
         messages: [
           {
             role: "system",
@@ -39,21 +46,15 @@ app.post("/ask", async (req, res) => {
 Ти проверяваш дали въведеният текст е НАПИТКА.
 
 Правила:
-1) Ако НЕ е напитка (храна, предмет, животно, място, човек, марка без да е напитка) или не си сигурен → върни САМО:
+1) Ако НЕ е напитка или не си сигурен → върни САМО:
 {"type":"unknown","description":"Не е напитка или неизвестно."}
 
 2) Ако Е напитка → върни САМО:
 {"type":"drink","rating":1,"label":"Внимавай","description":"кратко обяснение на български"}
-където rating е число 1-5, а label е точно "Добро" или "Внимавай".
+rating е 1-5, label е точно "Добро" или "Внимавай".
 
-Примери:
-- "баница" → unknown
-- "стол" → unknown
-- "вода" → drink
-- "кола" → drink
-
-Върни САМО JSON. Без допълнителен текст. Без markdown.
-`.trim()
+Върни САМО JSON. Без допълнителен текст.
+            `.trim()
           },
           { role: "user", content: prompt }
         ]
@@ -62,33 +63,34 @@ app.post("/ask", async (req, res) => {
 
     const data = await response.json();
 
-    // 👇 Виж какво реално връща OpenAI
-    console.log("OPENAI RESPONSE:", data);
-
-    if (!data.choices) {
-      return res.status(500).json({
-        error: "OpenAI error",
-        details: data
-      });
+    const aiText = data?.choices?.[0]?.message?.content?.trim();
+    if (!aiText) {
+      console.log("OPENAI RESPONSE (bad):", data);
+      return res.json({ type: "unknown", description: "Не е напитка или неизвестно." });
     }
 
-    const aiText = data.choices[0].message.content;
-    const parsed = JSON.parse(aiText);
+    let parsed = safeParseJSON(aiText);
+    if (!parsed || !parsed.type) {
+      console.log("BAD AI TEXT:", aiText);
+      parsed = { type: "unknown", description: "Не е напитка или неизвестно." };
+    }
 
-    res.json(parsed);
+    // нормализация
+    if (parsed.type === "drink") {
+      parsed.rating = Math.min(5, Math.max(1, Number(parsed.rating) || 3));
+      parsed.label = parsed.label === "Добро" ? "Добро" : "Внимавай";
+      parsed.description = (parsed.description || "").toString();
+    } else {
+      parsed = { type: "unknown", description: "Не е напитка или неизвестно." };
+    }
+
+    return res.json(parsed);
 
   } catch (err) {
     console.log("SERVER ERROR:", err);
-    res.status(500).json({ error: "AI error" });
+    return res.status(500).json({ type: "unknown", description: "Не е напитка или неизвестно." });
   }
 });
 
-// 👉 използвай PORT от Render
 const PORT = process.env.PORT || 10000;
-
-app.listen(PORT, () =>
-  console.log("Server started on port " + PORT)
-);
-
-
-
+app.listen(PORT, () => console.log("Server started on port " + PORT));
