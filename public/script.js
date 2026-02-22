@@ -35,7 +35,10 @@ input.addEventListener("keydown", async function(e){
 
     bubble.style.display = "block";
     chosenText.textContent = `Избрахте: ${drinkName}`;
-
+drinkInfo.textContent = "Мисля...";
+healthBadge.textContent = "Оценяване...";
+healthBadge.className = "badge warning";
+bubble.style.display = "block";
     try {
       const response = await fetch("/ask", {
         method: "POST",
@@ -62,6 +65,7 @@ input.addEventListener("keydown", async function(e){
     }
   }
 });
+
 
 
 
