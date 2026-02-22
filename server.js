@@ -52,11 +52,6 @@ app.post("/ask", async (req, res) => {
 "labelClass":"good" или "bad",
 "description":"кратко обяснение на български (1 изречение)"
 }
-
-labelClass:
-- "good" ако напитката е здравословна
-- "bad" ако е нездравословна
-
 3. НИКОГА не описвай обекти, които НЕ са напитки.
 4. Върни САМО JSON. Без допълнителен текст.
 
@@ -100,6 +95,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
 
 
 
