@@ -36,7 +36,7 @@ app.post("/ask", async (req, res) => {
           {
             role: "system",
             content: `
-Ти оценяваш САМО напитки.
+Ти оценяваш дали напитките са полезни за здравето, САМО напитки.
 
 Правила:
 
@@ -95,6 +95,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
 
 
 
