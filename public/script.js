@@ -43,6 +43,17 @@ input.addEventListener("keydown", async function(e){
         body: JSON.stringify({ prompt: drinkName })
       });
       const data = await response.json();
+      if (data.type === "unknown") {
+  healthBadge.textContent = "Не е напитка";
+  healthBadge.className = "badge warning";
+  drinkInfo.textContent = data.description;
+  setRating(3);
+} else {
+  healthBadge.textContent = data.label;        // "Добро" или "Внимавай"
+  healthBadge.className = `badge ${data.label === "Добро" ? "good" : "bad"}`;
+  drinkInfo.textContent = data.description;
+  setRating(data.rating);
+}
       console.log(data);
 
       drinkInfo.textContent = data.description;
@@ -62,6 +73,7 @@ input.addEventListener("keydown", async function(e){
     }
   }
 });
+
 
 
 
