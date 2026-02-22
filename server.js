@@ -36,24 +36,16 @@ app.post("/ask", async (req, res) => {
           {
             role: "system",
             content: `
-Ти проверяваш дали въведеният текст е НАПИТКА.
+You are a nutrition assistant.
+Respond ONLY in valid JSON format:
 
-Правила:
-1) Ако НЕ е напитка (храна, предмет, животно, място, човек, марка без да е напитка) или не си сигурен → върни САМО:
-{"type":"unknown","description":"Не е напитка или неизвестно."}
-
-2) Ако Е напитка → върни САМО:
-{"type":"drink","rating":1,"label":"Внимавай","description":"кратко обяснение на български"}
-където rating е число 1-5, а label е точно "Добро" или "Внимавай".
-
-Примери:
-- "баница" → unknown
-- "стол" → unknown
-- "вода" → drink
-- "кола" → drink
-
-Върни САМО JSON. Без допълнителен текст. Без markdown.
-`.trim()
+{
+  "description": "short explanation in Bulgarian",
+  "label": "Добро" or "Лошо",
+  "labelClass": "good" or "bad",
+  "rating": number from 1 to 5
+}
+`
           },
           { role: "user", content: prompt }
         ]
@@ -89,6 +81,8 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
+
 
 
 
