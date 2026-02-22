@@ -42,17 +42,24 @@ Respond ONLY in valid JSON format:
 }
 `
           },
-          {
-            role: "user",
-            content: prompt
-          }
+          { role: "user", content: prompt }
         ]
       })
     });
 
     const data = await response.json();
-    const aiText = data.choices[0].message.content;
 
+    // 👇 Виж какво реално връща OpenAI
+    console.log("OPENAI RESPONSE:", data);
+
+    if (!data.choices) {
+      return res.status(500).json({
+        error: "OpenAI error",
+        details: data
+      });
+    }
+
+    const aiText = data.choices[0].message.content;
     const parsed = JSON.parse(aiText);
 
     res.json(parsed);
@@ -69,4 +76,5 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
 
