@@ -43,13 +43,17 @@ input.addEventListener("keydown", async function(e){
         body: JSON.stringify({ prompt: drinkName })
       });
       const data = await response.json();
+      console.log(data);
 
       drinkInfo.textContent = data.description;
       healthBadge.textContent = data.label;
       healthBadge.className = `badge ${data.labelClass}`;
       setRating(data.rating);
 
-    } catch(err){
+    }catch (err) {
+
+      console.log("OPENAI ERROR:");
+      console.log(err);
       console.error(err);
       drinkInfo.textContent = "Грешка при оценката на напитката.";
       healthBadge.textContent = "Неизвестно";
@@ -58,5 +62,6 @@ input.addEventListener("keydown", async function(e){
     }
   }
 });
+
 
 
