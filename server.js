@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import fetch from "node-fetch";
 import cors from "cors";
@@ -28,7 +30,17 @@ app.post("/ask", async (req, res) => {
         messages: [
           {
             role: "system",
-            content: "You are a nutrition assistant that evaluates drinks."
+            content: `
+You are a nutrition assistant.
+Respond ONLY in valid JSON format:
+
+{
+  "description": "short explanation in Bulgarian",
+  "label": "Добро" or "Лошо",
+  "labelClass": "good" or "bad",
+  "rating": number from 1 to 5
+}
+`
           },
           {
             role: "user",
@@ -39,21 +51,17 @@ app.post("/ask", async (req, res) => {
     });
 
     const data = await response.json();
+    const aiText = data.choices[0].message.content;
 
-    res.json({
-      answer: data.choices[0].message.content
-    });
+    const parsed = JSON.parse(aiText);
+
+    res.json(parsed);
 
   } catch (err) {
-
-    console.log(err);
-
-    res.status(500).json({
-      error: "AI error"
-    });
+    console.log("SERVER ERROR:", err);
+    res.status(500).json({ error: "AI error" });
   }
 });
-
 
 // 👉 използвай PORT от Render
 const PORT = process.env.PORT || 10000;
@@ -61,3 +69,4 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
