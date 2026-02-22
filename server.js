@@ -35,7 +35,7 @@ app.post("/ask", async (req, res) => {
         messages: [
           {
             role: "system",
-            content: content: `
+            content: `
 Ти оценяваш САМО напитки.
 
 Правила:
@@ -95,6 +95,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
 
 
 
