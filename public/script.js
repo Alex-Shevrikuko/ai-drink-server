@@ -37,10 +37,10 @@ input.addEventListener("keydown", async function(e){
     chosenText.textContent = `Избрахте: ${drinkName}`;
 
     try {
-      const response = await fetch("/ask, {
+      const response = await fetch("/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ drink: drinkName })
+        body: JSON.stringify({ prompt: drinkName })
       });
       const data = await response.json();
 
@@ -58,4 +58,5 @@ input.addEventListener("keydown", async function(e){
     }
   }
 });
+
 
