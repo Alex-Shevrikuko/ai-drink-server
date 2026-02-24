@@ -59,6 +59,10 @@ app.post("/ask", async (req, res) => {
 "вода" → good
 "кола" → bad
 "баница" → unknown
+labelClass може да бъде:
+"good" – здравословна напитка
+"neutral" – нито добра, нито лоша
+"bad" – нездравословна напитка
 `
           },
           { role: "user", content: prompt }
@@ -95,6 +99,7 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () =>
   console.log("Server started on port " + PORT)
 );
+
 
 
 
